@@ -1,6 +1,11 @@
 #!/bin/bash
 
-SP_URL="https://ptpb.pw/"
+if [ -f $HOME/.config/simple-paste.conf ]; then
+	. $HOME/.config/simple-paste.conf;
+elif [ -f /etc/default/simple-paste.conf ]; then
+	. /etc/default/simple-paste.conf;
+else SP_URL="https://ptpb.pw/";
+fi
 
 help () {
 	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
