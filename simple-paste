@@ -1,10 +1,13 @@
 #!/bin/bash
 
-if [ -f $HOME/.config/simple-paste.conf ]; then
-	. $HOME/.config/simple-paste.conf;
-elif [ -f /etc/default/simple-paste.conf ]; then
-	. /etc/default/simple-paste.conf;
-else SP_URL="https://ptpb.pw/";
+if [ -f $HOME/.config/simple-paste.conf ]
+then
+	. $HOME/.config/simple-paste.conf
+elif [ -f /etc/default/simple-paste.conf ]
+then
+	. /etc/default/simple-paste.conf
+else
+	SP_URL="https://ptpb.pw/"
 fi
 
 help () {
@@ -28,11 +31,11 @@ screenshot () {
 	upload /tmp/$$.jpg
 }
 
-#if [ "$1" == "" ]
-#then
-#	help
-#	exit 0
-#fi
+if [ -z "$*" ] && [ ! -p /dev/fd/0 ]
+then
+	help
+	exit 0
+fi
 
 if [ "${1:0:1}"  == "-" ]
 then
