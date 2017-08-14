@@ -1,0 +1,49 @@
+#!/bin/bash
+
+SP_URL="https://ptpb.pw/"
+
+help () {
+	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
+	echo "Options: -a        paste screenshot of selected rectangle area"
+	echo "         -d UUID   delete paste by its uuid"
+	echo "         -s        paste screenshot of whole screen"
+	echo "         -w        paste screenshot of focused window"
+}
+
+upload () {
+	curl -F "c=@${1:--}" $SP_URL
+}
+
+delete () {
+	curl -X DELETE $SP_URL$1
+}
+
+screenshot () {
+	scrot -z -d 3 "$@" /tmp/$$.jpg
+	upload /tmp/$$.jpg
+}
+
+#if [ "$1" == "" ]
+#then
+#	help
+#	exit 0
+#fi
+
+if [ "${1:0:1}"  == "-" ]
+then
+	case $1 in
+		-a) screenshot -s
+			;;
+		-d) delete $2
+			;;
+		-s) screenshot
+			;;
+		-w) screenshot -u -b
+			;;
+		*)  help
+			;;
+	esac
+	exit 0
+fi
+
+upload $1
