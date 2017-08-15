@@ -1,0 +1,19 @@
+ource: simple-paste
+Section: misc
+Priority: optional
+Maintainer: Alf Gaida <agaida@siduction.org>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.0.0
+Vcs-Git: https://git.siduction.org/extra/simple-paste.git
+Vcs-Browser: https://git.siduction.org/extra/simple-paste/
+
+Package: simple-paste
+Architecture: all
+Depends: ${misc:Depends},
+         curl,
+         scrot
+Breaks: siduction-art-icons
+Replaces: siduction-art-icons
+Provides: siduction-art-icons
+Description: Siduction Icons 
+ Slow growing icon library.

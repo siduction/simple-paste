@@ -1,0 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: simple-paste
+
+Files:     *
+Copyright: 2017 Markus Meyer <coruja@siduction.org>
+License:   
+
+Files:     debian/* 
+Copyright: 2017 Alf Gaida <agaida@siduction.org>
+License:   
+
+License: GPL-2
