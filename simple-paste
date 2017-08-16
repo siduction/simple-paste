@@ -20,22 +20,66 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-
 SP_URL="https://ptpb.pw/"
+SP_UP_OPTIONS="-F sunset=1209600"
+
 [ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
 [ -f $HOME/.config/simple-paste.conf ] && source $HOME/.config/simple-paste.conf
 
+SP_COMMAND="upload"
 
 help () {
-	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
-	echo "Options: -a        paste screenshot of selected rectangle area"
+	echo "Usage:   COMMAND | simple-paste [-e TIME]"
+	echo "         simple-paste -a|-s|-w [-e TIME]"
+	echo "         simple-paste [-e TIME] FILE"
+	echo "         simple-paste URL"
+	echo "         simple-paste -d UUID"
+	echo "Options: -a        paste screenshot of selected rectangle area (delay: 3s)"
 	echo "         -d UUID   delete paste by its uuid"
-	echo "         -s        paste screenshot of whole screen"
-	echo "         -w        paste screenshot of focused window"
+	echo "         -e TIME   make paste be auto-deleted after TIME (default: 14 days)"
+	echo "                   TIME must be Ns (seconds), Nm (minutes), Nh (hours),"
+	echo "                   N or Nd (days), or Ny (years), e.g. 3h for 3 hours"
+	echo "         -s        paste screenshot of whole screen (delay: 3s)"
+	echo "         -w        paste screenshot of focused window (delay: 3s)"
+	exit 0
+}
+
+seconds () {
+	case ${1: -1} in
+		s)		s=${1:0:$(( ${#1} - 1 ))}
+				;;
+		m)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 60 ))
+				;;
+		h)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 3600 ))
+				;;
+		d)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 86400 ))
+				;;
+		y)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 31536000 ))
+				;;
+		[0-9])	s=$(( $1 * 86400 ))
+				;;
+	esac
+}
+
+check () {
+	if [ $# -ne 1 ]
+	then
+		help
+	else
+		if [ -f $1 ]
+		then
+			SP_COMMAND="$SP_COMMAND $1"
+		elif [[ $1 =~ ^http[s]?://.*$ ]]
+		then
+			SP_COMMAND="shorten_url $1"
+		else
+			help
+		fi
+	fi
 }
 
 upload () {
-	curl -F "c=@${1:--}" $SP_URL
+	curl $SP_UP_OPTIONS -F "c=@${1:--}" $SP_URL
 }
 
 delete () {
@@ -47,27 +91,38 @@ screenshot () {
 	upload /tmp/$$.jpg
 }
 
-if [ -z "$*" ] && [ ! -p /dev/fd/0 ]
+shorten_url () {
+	curl -F c=@- https://ptpb.pw/u <<< $1
+}
+
+if [ $# -eq 0 ] && [ ! -p /dev/fd/0 ]
 then
 	help
-	exit 0
 fi
 
-if [ "${1:0:1}"  == "-" ]
-then
-	case $1 in
-		-a) screenshot -s
+while getopts "ad:e:sw" o
+do
+	case $o in
+		a)	SP_COMMAND="screenshot -s"
 			;;
-		-d) delete $2
+		d)	SP_COMMAND="delete $OPTARG"
 			;;
-		-s) screenshot
+		e)	seconds $OPTARG
+			SP_UP_OPTIONS="-F sunset=$s"
 			;;
-		-w) screenshot -u -b
+		s)	SP_COMMAND="screenshot"
 			;;
-		*)  help
+		w)	SP_COMMAND="screenshot -u -b"
+			;;
+		*)	help
 			;;
 	esac
-	exit 0
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 0 ]
+then
+	check "$@"
 fi
 
-upload $1
+$SP_COMMAND
