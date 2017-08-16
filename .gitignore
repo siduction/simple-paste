@@ -1,0 +1,8 @@
+# block various temp files
+~*
+*.bak
+
+# block some editors
+.kdev4     export-ignore
+.idea      export-ignore
+
