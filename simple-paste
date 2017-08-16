@@ -20,17 +20,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+
 SP_URL="https://ptpb.pw/"
+[ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
+[ -f $HOME/.config/simple-paste.conf ] && source $HOME/.config/simple-paste.conf
 
-if [ -f /etc/default/simple-paste.conf ]
-then
-	. /etc/default/simple-paste.conf
-fi
-
-if [ -f $HOME/.config/simple-paste.conf ]
-then
-	. $HOME/.config/simple-paste.conf
-fi
 
 help () {
 	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
