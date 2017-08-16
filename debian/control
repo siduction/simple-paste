@@ -1,4 +1,4 @@
-ource: simple-paste
+Source: simple-paste
 Section: misc
 Priority: optional
 Maintainer: Alf Gaida <agaida@siduction.org>
@@ -12,8 +12,6 @@ Architecture: all
 Depends: ${misc:Depends},
          curl,
          scrot
-Breaks: siduction-art-icons
-Replaces: siduction-art-icons
-Provides: siduction-art-icons
-Description: Siduction Icons 
- Slow growing icon library.
+Description: Simple bash pastebin client for use with ptpb 
+ simple-paste is a bash script for uploading text, images (including
+ screenshots) and command output to pastebins powered by pb. 

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# simple-paste
+# This file is part of simple paste -- cli based paste client
+#
+# Copyright 2017 Markus Meyer <coruja@siduction.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA.
+
+if [ -f $HOME/.config/simple-paste.conf ]
+then
+	. $HOME/.config/simple-paste.conf
+elif [ -f /etc/default/simple-paste.conf ]
+then
+	. /etc/default/simple-paste.conf
+else
+	SP_URL="https://ptpb.pw/"
+fi
+
+help () {
+	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
+	echo "Options: -a        paste screenshot of selected rectangle area"
+	echo "         -d UUID   delete paste by its uuid"
+	echo "         -s        paste screenshot of whole screen"
+	echo "         -w        paste screenshot of focused window"
+}
+
+upload () {
+	curl -F "c=@${1:--}" $SP_URL
+}
+
+delete () {
+	curl -X DELETE $SP_URL$1
+}
+
+screenshot () {
+	scrot -z -d 3 "$@" /tmp/$$.jpg
+	upload /tmp/$$.jpg
+}
+
+if [ -z "$*" ] && [ ! -p /dev/fd/0 ]
+then
+	help
+	exit 0
+fi
+
+if [ "${1:0:1}"  == "-" ]
+then
+	case $1 in
+		-a) screenshot -s
+			;;
+		-d) delete $2
+			;;
+		-s) screenshot
+			;;
+		-w) screenshot -u -b
+			;;
+		*)  help
+			;;
+	esac
+	exit 0
+fi
+
+upload $1
