@@ -22,7 +22,7 @@
 
 # Default options
 SP_URL="https://ptpb.pw/"
-SP_UP_OPTIONS="-F sunset=1209600"
+SP_SUNSET="-F sunset=1209600"
 SP_SIZE_LIMIT=20971520
 
 # Check for config files and load them if they exist
@@ -91,7 +91,7 @@ check () {
 }
 
 upload () {
-	curl $SP_UP_OPTIONS -F "c=@${1:--}" $SP_URL
+	curl $SP_SUNSET -F "c=@${1:--}" $SP_URL
 }
 
 delete () {
@@ -122,7 +122,7 @@ do
 		d)	SP_COMMAND="delete $OPTARG"
 			;;
 		e)	seconds $OPTARG
-			SP_UP_OPTIONS="-F sunset=$s"
+			SP_SUNSET="-F sunset=$s"
 			;;
 		s)	SP_COMMAND="screenshot"
 			;;
