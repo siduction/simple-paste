@@ -40,7 +40,7 @@ help () {
 	echo "         simple-paste -a|-s|-w [-d DELAY] [-e TIME]"
 	echo "         simple-paste [-e TIME] FILE"
 	echo "         simple-paste URL"
-	echo "         simple-paste -d UUID"
+	echo "         simple-paste -x UUID"
 	echo "Options: -a        paste screenshot of selected rectangle area"
 	echo "         -d DELAY  set delay in seconds for full screen and window screenshots"
 	echo "                   (default: 3 seconds)"
