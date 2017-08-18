@@ -106,7 +106,7 @@ then
 	help
 fi
 
-# Parse options and set function to call and its options when needed
+# Parse options and set function to call and its options
 while getopts "ad:e:sw" o
 do
 	case $o in
@@ -125,14 +125,15 @@ do
 			;;
 	esac
 done
-# Remove all options from input arguments
+
+# Remove all options from arguments
 shift $((OPTIND - 1))
 
-# check arguments if there are any left
+# Check arguments if there are any left
 if [ $# -ne 0 ]
 then
 	check "$@"
 fi
 
-# Finally, run the function
+# Finally call the previously set function
 $SP_COMMAND
