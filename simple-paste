@@ -23,6 +23,7 @@
 # Default options
 SP_URL="https://ptpb.pw/"
 SP_UP_OPTIONS="-F sunset=1209600"
+SP_SIZE_LIMIT=20971520
 
 # Check for config files and load them if they exist
 [ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
@@ -73,7 +74,13 @@ check () {
 	else
 		if [ -f $1 ]
 		then
-			SP_COMMAND="$SP_COMMAND $1"
+			if (( $(stat -c %s $1) < $SP_SIZE_LIMIT ))
+			then
+				SP_COMMAND="$SP_COMMAND $1"
+			else
+				echo "E: File size of '$1' exceeds the file size limit, aborting..."
+				exit 1
+			fi
 		elif [[ $1 =~ ^http[s]?://.*$ ]]
 		then
 			SP_COMMAND="shorten_url $1"
