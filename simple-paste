@@ -20,10 +20,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+# Default options
 SP_URL="https://ptpb.pw/"
 SP_UP_OPTIONS="-F sunset=1209600"
 
+# Check for config files
 [ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
+[ -f /etc/simple-paste/simple-paste.conf ] && source /etc/simple-paste/simple-paste.conf
 [ -f $HOME/.config/simple-paste.conf ] && source $HOME/.config/simple-paste.conf
 
 SP_COMMAND="upload"
