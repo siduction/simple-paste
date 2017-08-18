@@ -24,6 +24,7 @@
 SP_URL="https://ptpb.pw/"
 SP_SUNSET="-F sunset=1209600"
 SP_SIZE_LIMIT=20971520
+SP_DELAY=3
 
 # Check for config files and load them if they exist
 [ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
@@ -36,17 +37,19 @@ SP_COMMAND="upload"
 # Some functions...
 help () {
 	echo "Usage:   COMMAND | simple-paste [-e TIME]"
-	echo "         simple-paste -a|-s|-w [-e TIME]"
+	echo "         simple-paste -a|-s|-w [-d DELAY] [-e TIME]"
 	echo "         simple-paste [-e TIME] FILE"
 	echo "         simple-paste URL"
 	echo "         simple-paste -d UUID"
-	echo "Options: -a        paste screenshot of selected rectangle area (delay: 3s)"
-	echo "         -d UUID   delete paste by its uuid"
+	echo "Options: -a        paste screenshot of selected rectangle area"
+	echo "         -d DELAY  set delay in seconds for full screen and window screenshots"
+	echo "                   (default: 3 seconds)"
 	echo "         -e TIME   make paste be auto-deleted after TIME (default: 14 days)"
 	echo "                   TIME must be Ns (seconds), Nm (minutes), Nh (hours),"
 	echo "                   N or Nd (days), or Ny (years), e.g. 3h for 3 hours"
-	echo "         -s        paste screenshot of whole screen (delay: 3s)"
-	echo "         -w        paste screenshot of focused window (delay: 3s)"
+	echo "         -s        paste screenshot of whole screen"
+	echo "         -w        paste screenshot of focused window"
+	echo "         -x UUID   delete paste by its uuid"
 	exit 0
 }
 
@@ -99,7 +102,7 @@ delete () {
 }
 
 screenshot () {
-	scrot -z -d 3 "$@" /tmp/$$.jpg
+	scrot -z -c -d $SP_DELAY "$@" /tmp/$$.jpg
 	upload /tmp/$$.jpg
 }
 
@@ -114,12 +117,13 @@ then
 fi
 
 # Parse options and set function to call and its options
-while getopts "ad:e:sw" o
+while getopts "ad:e:swx:" o
 do
 	case $o in
-		a)	SP_COMMAND="screenshot -s"
+		a)	SP_DELAY=0
+			SP_COMMAND="screenshot -s"
 			;;
-		d)	SP_COMMAND="delete $OPTARG"
+		d)	SP_DELAY="$OPTARG"
 			;;
 		e)	seconds $OPTARG
 			SP_SUNSET="-F sunset=$s"
@@ -127,6 +131,8 @@ do
 		s)	SP_COMMAND="screenshot"
 			;;
 		w)	SP_COMMAND="screenshot -u -b"
+			;;
+		x)	SP_COMMAND="delete $OPTARG"
 			;;
 		*)	help
 			;;
