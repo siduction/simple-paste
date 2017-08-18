@@ -24,13 +24,15 @@
 SP_URL="https://ptpb.pw/"
 SP_UP_OPTIONS="-F sunset=1209600"
 
-# Check for config files
+# Check for config files and load them if they exist
 [ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
 [ -f /etc/simple-paste/simple-paste.conf ] && source /etc/simple-paste/simple-paste.conf
 [ -f $HOME/.config/simple-paste.conf ] && source $HOME/.config/simple-paste.conf
 
+# Set initial function to call (which may be changed later)
 SP_COMMAND="upload"
 
+# Some functions...
 help () {
 	echo "Usage:   COMMAND | simple-paste [-e TIME]"
 	echo "         simple-paste -a|-s|-w [-e TIME]"
@@ -98,11 +100,13 @@ shorten_url () {
 	curl -F c=@- https://ptpb.pw/u <<< $1
 }
 
+# Display help if neither an argument nor piped input is given
 if [ $# -eq 0 ] && [ ! -p /dev/fd/0 ]
 then
 	help
 fi
 
+# Parse options and set function to call and its options when needed
 while getopts "ad:e:sw" o
 do
 	case $o in
@@ -121,11 +125,14 @@ do
 			;;
 	esac
 done
+# Remove all options from input arguments
 shift $((OPTIND - 1))
 
+# check arguments if there are any left
 if [ $# -ne 0 ]
 then
 	check "$@"
 fi
 
+# Finally, run the function
 $SP_COMMAND
