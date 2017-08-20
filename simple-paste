@@ -20,26 +20,81 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-if [ -f $HOME/.config/simple-paste.conf ]
-then
-	. $HOME/.config/simple-paste.conf
-elif [ -f /etc/default/simple-paste.conf ]
-then
-	. /etc/default/simple-paste.conf
-else
-	SP_URL="https://ptpb.pw/"
-fi
+# Default options
+SP_URL="https://ptpb.pw/"
+SP_SUNSET="-F sunset=1209600"
+SP_SIZE_LIMIT=20971520
+SP_DELAY=3
 
+# Check for config files and load them if they exist
+[ -f /etc/default/simple-paste.conf ] && source /etc/default/simple-paste.conf
+[ -f /etc/simple-paste/simple-paste.conf ] && source /etc/simple-paste/simple-paste.conf
+[ -f $HOME/.config/simple-paste.conf ] && source $HOME/.config/simple-paste.conf
+
+# Set initial function to call (which may be changed later)
+SP_COMMAND="upload"
+
+# Some functions...
 help () {
-	echo "Usage:   [COMMAND |] simple-paste [-a|-d UUID|-s|-w|FILE]"
+	echo "Usage:   COMMAND | simple-paste [-e TIME]"
+	echo "         simple-paste -a|-s|-w [-d DELAY] [-e TIME]"
+	echo "         simple-paste [-e TIME] FILE"
+	echo "         simple-paste URL"
+	echo "         simple-paste -x UUID"
 	echo "Options: -a        paste screenshot of selected rectangle area"
-	echo "         -d UUID   delete paste by its uuid"
+	echo "         -d DELAY  set delay in seconds for full screen and window screenshots"
+	echo "                   (default: 3 seconds)"
+	echo "         -e TIME   make paste be auto-deleted after TIME (default: 14 days)"
+	echo "                   TIME must be Ns (seconds), Nm (minutes), Nh (hours),"
+	echo "                   N or Nd (days), or Ny (years), e.g. 3h for 3 hours"
 	echo "         -s        paste screenshot of whole screen"
 	echo "         -w        paste screenshot of focused window"
+	echo "         -x UUID   delete paste by its uuid"
+	exit 0
+}
+
+seconds () {
+	case ${1: -1} in
+		s)		s=${1:0:$(( ${#1} - 1 ))}
+				;;
+		m)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 60 ))
+				;;
+		h)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 3600 ))
+				;;
+		d)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 86400 ))
+				;;
+		y)		s=$(( ${1:0:$(( ${#1} - 1 ))} * 31536000 ))
+				;;
+		[0-9])	s=$(( $1 * 86400 ))
+				;;
+	esac
+}
+
+check () {
+	if [ $# -ne 1 ]
+	then
+		help
+	else
+		if [ -f $1 ]
+		then
+			if (( $(stat -c %s $1) < $SP_SIZE_LIMIT ))
+			then
+				SP_COMMAND="$SP_COMMAND $1"
+			else
+				echo "E: File size of '$1' exceeds the file size limit, aborting..."
+				exit 1
+			fi
+		elif [[ $1 =~ ^http[s]?://.*$ ]]
+		then
+			SP_COMMAND="shorten_url $1"
+		else
+			help
+		fi
+	fi
 }
 
 upload () {
-	curl -F "c=@${1:--}" $SP_URL
+	curl $SP_SUNSET -F "c=@${1:--}" $SP_URL
 }
 
 delete () {
@@ -47,31 +102,51 @@ delete () {
 }
 
 screenshot () {
-	scrot -z -d 3 "$@" /tmp/$$.jpg
+	scrot -z -c -d $SP_DELAY "$@" /tmp/$$.jpg
 	upload /tmp/$$.jpg
 }
 
-if [ -z "$*" ] && [ ! -p /dev/fd/0 ]
+shorten_url () {
+	curl -F c=@- https://ptpb.pw/u <<< $1
+}
+
+# Display help if neither an argument nor piped input is given
+if [ $# -eq 0 ] && [ ! -p /dev/fd/0 ]
 then
 	help
-	exit 0
 fi
 
-if [ "${1:0:1}"  == "-" ]
-then
-	case $1 in
-		-a) screenshot -s
+# Parse options and set function to call and its options
+while getopts "ad:e:swx:" o
+do
+	case $o in
+		a)	SP_DELAY=0
+			SP_COMMAND="screenshot -s"
 			;;
-		-d) delete $2
+		d)	SP_DELAY="$OPTARG"
 			;;
-		-s) screenshot
+		e)	seconds $OPTARG
+			SP_SUNSET="-F sunset=$s"
 			;;
-		-w) screenshot -u -b
+		s)	SP_COMMAND="screenshot"
 			;;
-		*)  help
+		w)	SP_COMMAND="screenshot -u -b"
+			;;
+		x)	SP_COMMAND="delete $OPTARG"
+			;;
+		*)	help
 			;;
 	esac
-	exit 0
+done
+
+# Remove all options from arguments
+shift $((OPTIND - 1))
+
+# Check arguments if there are any left
+if [ $# -ne 0 ]
+then
+	check "$@"
 fi
 
-upload $1
+# Finally call the previously set function
+$SP_COMMAND
