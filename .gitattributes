@@ -12,3 +12,4 @@
 .*~        export-ignore
 .kdev4     export-ignore
 .idea      export-ignore
+release.sh export-ignore
