@@ -1,5 +1,5 @@
-simple-paste (0.0.1-1) unstable; urgency=low
+simple-paste (0.1.0-1) unstable; urgency=low
 
-  * Initial imported upstream version 0.0.1
+  * Initial imported upstream version 0.1.0.
 
- -- Alf Gaida <agaida@siduction.org>  Wed, 16 Aug 2017 02:10:25 +0200
+ -- Alf Gaida <agaida@siduction.org>  Mon, 21 Aug 2017 00:07:19 +0200
