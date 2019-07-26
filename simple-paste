@@ -92,7 +92,7 @@ screenshot () {
 }
 
 shorten_url () {
-	curl -F c=@- https://ptpb.pw/u <<< $1
+	curl -F c=@- $SP_URL/u <<< $1
 }
 
 if [ $# -eq 0 ] && [ ! -p /dev/fd/0 ]
