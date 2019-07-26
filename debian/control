@@ -2,8 +2,8 @@ Source: simple-paste
 Section: misc
 Priority: optional
 Maintainer: Alf Gaida <agaida@siduction.org>
-Build-Depends: debhelper (>= 10)
-Standards-Version: 4.0.0
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.4.0
 Vcs-Git: https://git.siduction.org/extra/simple-paste.git
 Vcs-Browser: https://git.siduction.org/extra/simple-paste/
 
@@ -12,6 +12,6 @@ Architecture: all
 Depends: ${misc:Depends},
          curl,
          scrot
-Description: Simple bash pastebin client for use with ptpb 
+Description: Simple bash pastebin client for use with ptpb
  simple-paste is a bash script for uploading text, images (including
- screenshots) and command output to pastebins powered by pb. 
+ screenshots) and command output to pastebins powered by pb.
