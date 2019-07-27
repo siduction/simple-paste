@@ -1,0 +1,56 @@
+.TH simple-paste 1 "July 2019" "0.2.0" "simple-paste"
+.SH NAME
+simple-paste \- Swiss Army knife for pasting
+.SH SYNOPSIS
+.TP
+COMMAND | simple-paste [-e TIME]
+.TP
+simple-paste -a|-s|-w [-e TIME]
+.TP
+simple-paste [-e TIME] FILE
+.TP
+simple-paste URL
+.TP
+simple-paste -d UUID
+.SH DESCRIPTION
+Simple-paste is a versatile cli tool for pasting, written in Bash,
+powered by a running instance of pb (see https://github.com/ptpb/pb
+for details).
+It supports pasting text and image files, piped command output and
+various kinds of screenshots (whole screen, focused window or
+selectable rectangle area) as well as shortening long URLs. Pasted 
+content may also be deleted manually or set to expire automatically 
+after some time.
+.SH OPTIONS
+.TP
+.B -a
+Paste screenshot of selectable rectangle area (delay: 3s).
+.TP
+.B -d UUID
+Delete paste manually by its UUID.
+.TP
+.B -e TIME
+Set paste to expire automatically after TIME (default: 14 days). 
+TIME must be Ns (seconds), Nm (minutes), Nh (hours), N or Nd (days), 
+or Ny (years), e.g. 3h for 3 hours.
+.TP
+.B -s
+Paste screenshot of whole screen (delay: 3s).
+.TP
+.B -w
+Paste screenshot of focused window (delay: 3s).
+.SH FILES
+/etc/default/simple-paste.conf \- default configuration file
+.SH BUGS
+Please feel free to report bugs or to give any other feedback:
+.TP
+* bug tracker: https://git.siduction.org/extra/simple-paste/issues
+.TP 
+* IRC channel: #siduction-dev (on OFTC network)
+.SH COPYING
+.TP
+Copyright: © 2017-2019 Markus Meyer aka coruja <coruja@siduction.org>
+.TP
+License: GNU General Public License, version 2 or any later
+.SH AUTHOR
+Markus Meyer aka coruja <coruja@siduction.org>
